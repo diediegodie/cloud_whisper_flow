@@ -1,0 +1,126 @@
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+.sublime-settings
+.vim/
+.emacs
+*.code-workspace
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.hypothesis/
+*.cover
+
+# Flet Build & Packaging
+build/
+dist/
+*.spec
+.flet/
+*.exe
+*.msi
+*.dmg
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+secrets.json
+config.local.json
+api_keys.txt
+
+# Logs
+*.log
+logs/
+debug.log
+*.log.*
+CloudWhisperFlow_debug.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Temporary Files
+*.tmp
+*.temp
+*.bak
+*.backup
+~*
+*.swp
+*.swo
+*~
+.~*
+
+# Audio Files (Development)
+*.wav
+*.mp3
+*.flac
+*.aac
+recordings/
+
+# User-Specific Files
+config.json
+user_settings.json
+*.user
+
+# Node (if using for any tooling)
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Misc
+*.DS_Store
+.AppleDouble
+.LSOverride
+.TemporaryItems
+.VolumeIcon.icns
+.env.prod
