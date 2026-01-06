@@ -1,3 +1,6 @@
+# Planning & Documentation (Local Development)
+.planning/
+
 # Virtual Environments
 venv/
 env/
