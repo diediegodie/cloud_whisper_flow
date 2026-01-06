@@ -1,0 +1,15 @@
+services:
+  cloudwhisper-dev:
+    build: .
+    image: cloudwhisper:dev
+    container_name: cloudwhisper-dev
+    volumes:
+      - .:/app
+      - /tmp/pulse-socket:/tmp/pulse-socket
+    devices:
+      - /dev/snd:/dev/snd
+    environment:
+      - PULSE_SERVER=unix:/tmp/pulse-socket
+    stdin_open: true
+    tty: true
+    network_mode: host

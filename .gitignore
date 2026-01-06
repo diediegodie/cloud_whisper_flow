@@ -1,6 +1,5 @@
 # Planning & Documentation (Local Development)
-.planning/
-.prompts/
+.AGENT_GUIDE/
 
 # Virtual Environments
 venv/
