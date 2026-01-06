@@ -1,5 +1,6 @@
 # Planning & Documentation (Local Development)
 .planning/
+.prompts/
 
 # Virtual Environments
 venv/
