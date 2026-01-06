@@ -1,0 +1,4 @@
+SpeechRecognition==3.10.0
+deep-translator==1.11.4
+sounddevice==0.4.6
+numpy>=1.21.0
