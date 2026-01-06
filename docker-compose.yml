@@ -5,6 +5,7 @@ services:
     container_name: cloudwhisper-dev
     volumes:
       - .:/app
+      - ./model:/app/model  # Mount host model dir for Vosk (dev-friendly, avoids large COPY)
       - /tmp/pulse-socket:/tmp/pulse-socket
     devices:
       - /dev/snd:/dev/snd

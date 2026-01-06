@@ -1,0 +1,9 @@
+{
+  "model_path": "./model",
+  "model_language": "pt",
+  "description": "Vosk Portuguese model used for STT. Expected to transcribe Portuguese speech (pt) and be translated to English (en) if requested.",
+  "recommended_usage": "Use --model-path /full/path/to/model and --lang Portuguese or --translate-target en to translate PT->EN.",
+  "source": "user-provided",
+  "registered_by": "assistant",
+  "date": "2026-01-06"
+}

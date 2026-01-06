@@ -1,5 +1,11 @@
-# Updated requirements for Task 2
+# Updated requirements for Task 2 (core)
 sounddevice==0.4.6
 numpy>=1.21.0
 vosk==0.3.45
 deep-translator==1.11.4
+
+# Optional GUI / integration dependencies (add when building UI or packaging):
+# flet: UI framework; keyboard: global hotkey listener; pyautogui: text injection
+flet
+keyboard
+pyautogui

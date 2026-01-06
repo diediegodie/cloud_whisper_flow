@@ -1,6 +1,8 @@
 """
 CloudWhisper Flow - Console Test Script (Phase 01, Task 2)
-Supports microphone recording (--seconds) and WAV file input (--file). Uses Vosk offline.
+Supports microphone recording (--seconds) and WAV/MP3 file input (--file). Uses Vosk offline.
+Adds a simple --lang argument (default: Portuguese) and a simulated output section that
+prints translated text to console (no GUI automation).
 """
 
 import argparse
@@ -13,7 +15,7 @@ import wave
 import subprocess
 import tempfile
 import os
-from deep_translator import GoogleTranslator
+
 
 # Defaults
 DEFAULT_DURATION = 5
@@ -22,7 +24,11 @@ MODEL_PATH = "model"  # default model directory (place language models under ./m
 
 
 def record_audio(duration=DEFAULT_DURATION, sample_rate=DEFAULT_SAMPLE_RATE):
-    """Record audio from microphone. Returns bytes (PCM16) and sample_rate."""
+    """Record audio from microphone. Returns bytes (PCM16) and sample_rate.
+
+    Ensures the sounddevice stream is stopped on success or error to avoid
+    leaving audio resources open.
+    """
     try:
         print(f"Recording for {duration} seconds... (please speak)", file=sys.stderr)
         audio_data = sd.rec(
@@ -32,11 +38,20 @@ def record_audio(duration=DEFAULT_DURATION, sample_rate=DEFAULT_SAMPLE_RATE):
             dtype="float32",
         )
         sd.wait()
+        # stop any active stream to clean up resources
+        try:
+            sd.stop()
+        except Exception:
+            pass
         # Convert float32 [-1,1] to int16 PCM
         int16 = (audio_data.flatten() * 32767).astype(np.int16)
         return int16.tobytes(), sample_rate
     except Exception as e:
         print(f"Recording error: {e}", file=sys.stderr)
+        try:
+            sd.stop()
+        except Exception:
+            pass
         return None, None
 
 
@@ -126,10 +141,30 @@ def transcribe_pcm_bytes(pcm_bytes, sample_rate, model):
 
 def translate_text(text, target_lang):
     try:
+        try:
+            from deep_translator import GoogleTranslator
+        except ImportError:
+            print(
+                "deep_translator is not installed. Please install it to use translation.",
+                file=sys.stderr,
+            )
+            return None
         return GoogleTranslator(source="auto", target=target_lang).translate(text)
     except Exception as e:
         print(f"Translation error: {e}", file=sys.stderr)
         return None
+
+
+def simulate_output(translated_text, target_label):
+    """Simulate application output by printing formatted text to console.
+
+    This is a placeholder for future GUI automation (pyautogui) and keeps behavior
+    observable during console testing.
+    """
+    print("\n--- Simulated Output ---")
+    print(f"Target Language: {target_label}")
+    print(f"Output Text: {translated_text}")
+    print("--- End Simulated Output ---\n")
 
 
 def main():
@@ -151,7 +186,14 @@ def main():
         "--translate-target",
         "-t",
         type=str,
-        help="Translate transcription to target language (e.g., es)",
+        help="Translate transcription to target language (e.g., en)",
+    )
+    p.add_argument(
+        "--lang",
+        "-l",
+        type=str,
+        default="Portuguese",
+        help="Target language name (e.g., English, Portuguese). Used when --translate-target not provided.",
     )
     p.add_argument(
         "--model-path",
@@ -201,17 +243,52 @@ def main():
         print("Transcription failed.", file=sys.stderr)
         sys.exit(1)
 
-    if text.strip() == "":
-        print("No transcription detected.")
-        sys.exit(2)
-
     print("Transcription complete!")
-    print(f"Text: {text}")
+    if text.strip() == "":
+        print("Text:")
+    else:
+        print(f"Text: {text}")
 
-    if args.translate_target:
-        tr = translate_text(text, args.translate_target)
+    # Determine translation target: prefer explicit code, otherwise map language name.
+    # If no explicit --translate-target provided, consult model metadata and prefer
+    # English when the model_language is Portuguese (pt) to avoid translation mismatches.
+    def _read_model_metadata(paths):
+        for p in paths:
+            try:
+                with open(p, "r", encoding="utf-8") as fh:
+                    import json as _json
+
+                    return _json.load(fh)
+            except Exception:
+                continue
+        return {}
+
+    metadata_paths = [os.path.join(args.model_path, "model_metadata.json"), "model_metadata.json"]
+    metadata = _read_model_metadata(metadata_paths)
+
+    # Base target: explicit code wins, otherwise use provided language name
+    target_input = args.translate_target if args.translate_target else args.lang
+
+    # Auto-prefer English when model is Portuguese and no explicit translate-target was set
+    if not args.translate_target:
+        model_lang = metadata.get("model_language", "").lower()
+        if model_lang == "pt":
+            # Only auto-override if user left the default or specified Portuguese
+            if (not args.lang) or args.lang.lower().startswith("portugu"):
+                target_input = "en"
+
+    if target_input:
+        # map common language names to ISO codes for convenience
+        lang_map = {"english": "en", "portuguese": "pt", "spanish": "es", "french": "fr"}
+        target_code = target_input.lower()
+        if len(target_code) > 2:  # likely a name like "English"
+            target_code = lang_map.get(target_code, None)
+        if not target_code:
+            target_code = target_input  # try using as-is (e.g., 'de')
+        tr = translate_text(text, target_code)
         if tr:
-            print(f"Translation ({args.translate_target}): {tr}")
+            simulate_output(tr, target_input)
+            print(f'Original: "{text}"')
 
 
 if __name__ == "__main__":
