@@ -1,5 +1,6 @@
 # Planning & Documentation (Local Development)
 .AGENT_GUIDE/
+.github/
 
 # Virtual Environments
 venv/
